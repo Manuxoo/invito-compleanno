@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Invito Speciale - Sfida del Compleanno</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg); 
+            }
+            50% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg); 
+            }
+        }
+
+        .time-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .time-display.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .welcome-screen {
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .login-form {
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .challenge-container {
+            display: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        .challenge-container.active {
+            display: block;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-greeting {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .challenge {
+            display: none;
+            padding: 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .challenge.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .challenge h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e6ed;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+            text-align: left;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+        }
+
+        .info-item.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .info-item h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .warning-message {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .final-message {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 18px;
+            margin-top: 25px;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .celebration {
+            font-size: 50px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { 
+                transform: translateY(0); 
+            }
+            50% { 
+                transform: translateY(-10px); 
+            }
+        }
+
+        .hint {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        @keyframes shake {
+            0%, 100% { 
+                transform: translateX(0); 
+            }
+            25% { 
+                transform: translateX(-5px); 
+            }
+            75% { 
+                transform: translateX(5px); 
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .time-display {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="time-display" id="timeDisplay">⏰ 17:00</div>
+        
+        <!-- Welcome/Login Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1>🎉 Invito Speciale 🎉</h1>
+            <p style="color: #666; margin-bottom: 30px;">Benvenuto alla sfida del compleanno!</p>
+            
+            <div class="login-form">
+                <input type="text" id="username" placeholder="Inserisci nome e cognome" maxlength="50">
+                <button class="btn" onclick="startChallenge()">Inizia l'Avventura</button>
+            </div>
+        </div>
+
+        <!-- Challenge Container -->
+        <div class="challenge-container" id="challengeContainer">
+            <div class="user-greeting" id="userGreeting"></div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Challenge 1: Math Riddle -->
+            <div class="challenge active" id="challenge1">
+                <h3>🧮 Sfida 1: Enigma Matematico</h3>
+                <p>Se MaiSbagliare fa 15 anni e il suo compleanno è il 15 agosto, ma la festa è 2 giorni dopo, in che giorno è la festa?</p>
+                <input type="text" id="answer1" placeholder="Scrivi la data">
+                <button class="btn" onclick="checkAnswer(1)">Conferma</button>
+            </div>
+
+            <!-- Challenge 2: Logic Puzzle -->
+            <div class="challenge" id="challenge2">
+                <h3>🧩 Sfida 2: Indovinello Logico</h3>
+                <p>mai_sbagliare.?</p>
+                <input type="text" id="answer2" placeholder="Inserisci la risposta">
+                <button class="btn" onclick="checkAnswer(2)">Conferma</button>
+                <div class="hint">💡 Suggerimento: Nome ig completo</div>
+            </div>
+
+            <!-- Challenge 3: Pattern Recognition -->
+            <div class="challenge" id="challenge3">
+                <h3>🔢 Sfida 3: Sequenza Numerica</h3>
+                <p>L'orario della festa segue questo schema: 1️⃣7️⃣:0️⃣0️⃣<br>
+                Quante cifre contiene l'orario?</p>
+                <input type="number" id="answer3" placeholder="Numero di cifre" min="1" max="10">
+                <button class="btn" onclick="checkAnswer(3)">Conferma</button>
+                <div class="hint">💡 Suggerimento: Conta tutte le cifre in "17:00"</div>
+            </div>
+
+            <!-- Revealed Information -->
+            <div id="revealedInfo"></div>
+            
+            <!-- Warning Message -->
+            <div class="warning-message" id="warningMessage" style="display: none;">
+                ⚠️ <strong>IMPORTANTE!</strong><br>
+                CHIEDERE PRIMA DI CHIEDERE A QUALCUN'ALTRO SE C'È, PER EVITARE EVENTUALI DISAGI, CHIEDERE PRIMA A ME
+            </div>
+
+            <!-- Final Challenge & Message -->
+            <div class="final-message" id="finalMessage" style="display: none;">
+                <div class="celebration">🎊</div>
+                <p>Congratulazioni! Hai completato tutte le sfide!</p>
+                <br>
+                <p><strong>DAMMI CONFERMA CIOCCOLATTINO 100% FONDENTE</strong></p>
+                <div class="celebration">🍫</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = '';
+        let currentChallenge = 1;
+        const totalChallenges = 3;
+        
+        const challenges = {
+            1: { answer: '17 agosto', info: { title: '📅 Data della Festa', content: '17 agosto 2025<br><small>(Il vero compleanno di Manuel è il 15 agosto!)</small>' }},
+            2: { answer: 'mai_sbagliare.privato', info: { title: '🎂 Il Festeggiato', content: 'Manuel<br><small>(aka MaiSbagliare)</small>' }},
+            3: { answer: '4', info: { title: '📍 Posizione', content: '<a href="https://maps.app.goo.gl/ErBuTgaMB1o1skAp7" target="_blank" style="color: #667eea; text-decoration: none;">📍 Clicca per vedere la location</a>' }}
+        };
+
+        function startChallenge() {
+            const username = document.getElementById('username').value.trim();
+            if (username.length < 2) {
+                alert('Per favore inserisci il tuo nome completo!');
+                return;
+            }
+            
+            currentUser = username;
+            
+            // Hide welcome screen and show challenge container
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('challengeContainer').classList.add('active');
+            
+            // Show time display and user greeting
+            document.getElementById('timeDisplay').classList.add('show');
+            document.getElementById('userGreeting').innerHTML = `Ciao ${username}! 👋<br>Risolvi le sfide per scoprire tutti i dettagli della festa!`;
+            
+            updateProgress();
+        }
+
+        function checkAnswer(challengeNum) {
+            const userAnswer = document.getElementById(`answer${challengeNum}`).value.toLowerCase().trim();
+            const correctAnswer = challenges[challengeNum].answer.toLowerCase();
+            
+            if (userAnswer === correctAnswer) {
+                // Correct answer
+                document.getElementById(`challenge${challengeNum}`).style.display = 'none';
+                revealInfo(challengeNum);
+                
+                if (challengeNum < totalChallenges) {
+                    // Show next challenge
+                    setTimeout(() => {
+                        currentChallenge = challengeNum + 1;
+                        document.getElementById(`challenge${currentChallenge}`).classList.add('active');
+                        updateProgress();
+                    }, 1000);
+                } else {
+                    // All challenges completed
+                    setTimeout(() => {
+                        showFinalMessage();
+                    }, 1000);
+                }
+            } else {
+                // Wrong answer
+                const input = document.getElementById(`answer${challengeNum}`);
+                input.style.border = '2px solid #ff6b6b';
+                input.style.animation = 'shake 0.5s ease';
+                
+                setTimeout(() => {
+                    input.style.border = '2px solid #e0e6ed';
+                    input.style.animation = '';
+                }, 1000);
+            }
+        }
+
+        function revealInfo(challengeNum) {
+            const infoContainer = document.getElementById('revealedInfo');
+            const info = challenges[challengeNum].info;
+            
+            const infoElement = document.createElement('div');
+            infoElement.className = 'info-item';
+            infoElement.innerHTML = `<h4>${info.title}</h4><p>${info.content}</p>`;
+            
+            infoContainer.appendChild(infoElement);
+            
+            setTimeout(() => {
+                infoElement.classList.add('revealed');
+            }, 100);
+        }
+
+        function updateProgress() {
+            const progress = ((currentChallenge - 1) / totalChallenges) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showFinalMessage() {
+            document.getElementById('warningMessage').style.display = 'block';
+            document.getElementById('finalMessage').style.display = 'block';
+            document.getElementById('progressFill').style.width = '100%';
+        }
+    </script>
+</body>
+</html>
